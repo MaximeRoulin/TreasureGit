@@ -1,0 +1,97 @@
+package ie.tipreels.treasure.game;
+
+import java.util.List;
+import java.util.ResourceBundle;
+
+import ie.tipreels.treasure.TreasureGamePanel;
+import ie.tipreels.treasure.game.cards.Card;
+import ie.tipreels.treasure.game.info.TreasureGameInfo;
+
+public interface GameSystem {
+	//Getters and Setters
+	public int getNumberOfPlayers();
+	public int getCurrentPlayerIndex();
+	public Player getCurrentPlayer();
+	public List<Player> getPlayers();
+	public List<Card> getPirateDeck();	
+	public GameLog getLog();
+	public TreasureGamePanel getGamePanel();
+	public String getPirateName();
+	public boolean isPiratePlayedCard();
+	public void setPiratePlayedCard(boolean piratePlayedCard);
+	public boolean isPirateHasMoved();
+	public void setPirateHasMoved(boolean pirateHasMoved);
+	public boolean isOutOfTurnPirateControl();
+	public void setOutOfTurnPirateControl(boolean outOfTurnPirateControl);
+	public void setGivenInfoScreen(GivenInfoScreen givenInfoScreen);
+	public void setTipScreen(TipScreen tipScreen);
+	public int getPickedPawn();
+	public void setPickedPawn(int pawn);
+	public void setElevation(boolean elevation);
+	public List<Cancelable> getCancelable();
+	public int getTurn();
+	public List<Player> getHammocked();
+	public List<Player> getRummed();
+	public ResourceBundle getMessagesBundle();
+	public ResourceBundle getGamelogBundle();
+	
+	//Methods
+	public void setHideTurnPopUp(boolean hideTurnPopUp);
+	public void pickCard(Card card);
+	public void discardPirateCard(Card card);
+	public void confirmPirateDeck();
+	public void confirmCardStack();
+	public void createCardStack();
+	public Card pickExplorerCard();
+	public void discardExplorerCard(Card card);
+	public void play(int playerIndex) throws Exception;
+	public void playNext();
+	public boolean drawCard(HammockScreen hammockScreen);
+	public void allowMove(Player playing, boolean endTurn);
+	public void allowMove(Player playing, boolean endTurn, int pawn);
+	public void win(Player player);
+	public List<Card> getNextHand();
+	public void throwDiceForMove(int pawn, boolean endTurn);	
+	public void injurePlayer(int playerIndex, int pawn);
+	public void injurePlayer(Player player, int pawn, boolean endTurn);
+	public int throwDice(int modifier);
+	public void showChestScreen(Player player, int pawn, ContentType content);	
+	public int findPlayerIndex(PlayerRole type);
+	public void firstSetUpFight(Player hostile, Player attacked, boolean initiated);	
+	public void secondSetUpFight(Player hostile, int hostileScore, Player attacked, boolean initiated);
+	public void restartFight(boolean loserInjured, Player player);
+	public void resetReroll();
+	public void playCard(CardButton cardButton);
+	public void selectInfo(boolean trueInfo);
+	public void giveInfoToPlayer(TreasureGameInfo info, int tippedPlayerIndex);
+	public void showErrorMessage(String message);
+	public void showExceptionMessage(Exception e);
+	public void pickPawnForMove(Player player, boolean endTurn);
+	public void healPlayer(Player player);
+	public void startRelocate(TileType coast);
+	public void goBackToCurrentPlayer();
+	public void prepareForHammock();
+	public void clearCurrentPlayerFromHammocked();
+	public void highlightPlayerInfo(Player player);
+	public void endTurn();
+	public void disposeOfGivenInfoScreen();
+	public void pickPawnNoise();
+	public void pickFirstPawnPlot();
+	public void pickPawnPoison();
+	public void pickPawnSpy();
+	public void reinforceCurrentPlayer();
+	public void elevationPlayed();
+	public void rumPlayed();
+	public void placeTrap();
+	public void showUnderstandingScreen();
+	public void removeFromHammocked(Player player);
+	public void removeFromRummed(Player player);
+	public void unReinforcePlayer(Player player);
+	public String getCancelableString(CancelableType cancelable, Player player, int turn);
+	public void showVandalismScreen();
+	public void discardCard(Player player, Card card);
+	public List<Card> getPlayerHand(Player player);
+	public Player getNextPlayer();
+	public void outbreak(Player contaminated);
+	public void contaminate(Player sick);
+}
