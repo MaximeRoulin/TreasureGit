@@ -18,6 +18,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 
 import ie.tipreels.treasure.game.CardButton;
@@ -178,7 +179,6 @@ public class PirateDeckScreen extends JFrame {
 						system.discardPirateCard(card);
 					}
 					updateDeck();
-					
 				}
 				
 			});
@@ -220,8 +220,10 @@ public class PirateDeckScreen extends JFrame {
 		});
 		gbc.gridy++;
 		deckPanel.add(validateButton, gbc);
-		this.getContentPane().add(deckPanel);
-//		System.out.println("Taille des cartes obligatoires pour le pirate : " + system.getPirateCards().size() + "\nTaille des cartes à selectionner par le pirate : " + cardsLeftToChoose + ".\nNumber of players : " + system.getNumberOfPlayers() + ".");
+		JScrollPane verticalScrollPane = new JScrollPane(deckPanel);
+//		verticalScrollPane.add(deckPanel);
+		this.getContentPane().add(verticalScrollPane);
+//		System.out.println("Taille des cartes obligatoires pour le pirate : " + system.getPirateCards().size() + "\nTaille des cartes ï¿½ selectionner par le pirate : " + cardsLeftToChoose + ".\nNumber of players : " + system.getNumberOfPlayers() + ".");
 		this.setVisible(true);
 		ResourceBundle gamelogBundle = ResourceBundle.getBundle("GamelogBundle", currentLocale);
 		if(!hideTurnPopUp) {			
@@ -232,11 +234,20 @@ public class PirateDeckScreen extends JFrame {
 
 	protected void updateDeck() {
 		selectLabel.setText(cardsBundle.getString("pirate_deck") + cardsLeftToChoose);
-		JPanel mainPanel = (JPanel) this.getContentPane().getComponent(0);
+		//TODO: Update because of ScrollPane addition
+		JScrollPane verticalScrollPane = (JScrollPane) this.getContentPane().getComponent(0);
+//		System.out.println("Number of components : " + verticalScrollPane.getComponentCount() + verticalScrollPane.getComponent(0));
+		JPanel mainPanel = (JPanel) verticalScrollPane.getViewport().getView();
 		JButton button = (JButton) mainPanel.getComponent(4);
-		button.setEnabled(cardsLeftToChoose == 0);
+		if(cardsLeftToChoose == 0) {
+			button.setEnabled(true);
+			JScrollBar scrollBar = verticalScrollPane.getVerticalScrollBar();
+			if(scrollBar != null)
+				scrollBar.setValue(scrollBar.getMaximum());
+		}
+		else
+			button.setEnabled(false);
 		this.revalidate();
-
 	}
 	
 	public TurnScreen getPopUp() {

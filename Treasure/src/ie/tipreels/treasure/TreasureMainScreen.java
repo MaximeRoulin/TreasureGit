@@ -269,7 +269,6 @@ public class TreasureMainScreen extends JFrame {
 		this.repaint();
 		this.getContentPane().add(mainPanel);
 		this.validate();
-		
 	}
 	
 	protected void localPlayersSelect() {
@@ -326,6 +325,7 @@ public class TreasureMainScreen extends JFrame {
 		});
 		localPlayerSelectPanel.add(numberSelection, gbc);
 		showPlayerSetUp(localPlayerSelectPanel);
+		JPanel buttonsPanel = new JPanel();
 //		System.out.println(localPlayerSelectPanel.getComponentCount());
 		JButton back = new JButton(messages.getString("back"));
 		back.addActionListener(new ActionListener() {
@@ -344,10 +344,14 @@ public class TreasureMainScreen extends JFrame {
 			}
 			
 		});
-		gbc.gridy = 3;
 		gbc.gridx = 0;
-		gbc.anchor = GridBagConstraints.SOUTH;
-		localPlayerSelectPanel.add(back, gbc);
+		gbc.gridy = 0;
+		gbc.gridwidth = 0;
+		buttonsPanel.add(back, gbc);
+//		gbc.gridy = 3;
+//		gbc.gridx = 0;
+//		gbc.anchor = GridBagConstraints.SOUTH;
+//		localPlayerSelectPanel.add(back, gbc);
 		JButton play = new JButton(messages.getString("play"));
 		play.addActionListener(new ActionListener() {
 
@@ -369,7 +373,12 @@ public class TreasureMainScreen extends JFrame {
 			
 		});
 		gbc.gridx++;
-		localPlayerSelectPanel.add(play, gbc);
+		buttonsPanel.add(play, gbc);
+		gbc.gridy = 3;
+		gbc.gridx = 0;
+		gbc.gridwidth = 4;
+		gbc.anchor = GridBagConstraints.SOUTH;
+		localPlayerSelectPanel.add(buttonsPanel, gbc);
 		this.getContentPane().add(localPlayerSelectPanel);
 		this.validate();
 	}
@@ -917,7 +926,7 @@ public class TreasureMainScreen extends JFrame {
 		JPanel settingsPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
 		JLabel settingsLabel = new JLabel(messages.getString("settings"));
-		settingsLabel.setFont(new Font(Font.SERIF, Font.BOLD, 20));
+		settingsLabel.setFont(new Font(Font.SERIF, Font.PLAIN, 20));
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.insets = new Insets(5, 5, 5, 5);

@@ -21,5 +21,4 @@ public class GameLog extends JTextArea {
 	    setCaretPosition(getDocument().getLength());
 	}
 
-	
 }

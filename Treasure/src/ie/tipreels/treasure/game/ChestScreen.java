@@ -76,7 +76,10 @@ public class ChestScreen extends JFrame {
 					if(index == -1)
 						JOptionPane.showMessageDialog(null, messages.getString("error"), messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 					else {
-						system.injurePlayer(index, pawn);
+						if(player.getRole() == PlayerRole.ENGINEER)
+							system.getLog().appendWithLineBreak(system.getGamelogBundle().getString("trapped_engineer"));
+						else
+							system.injurePlayer(index, pawn);
 						self.dispose();
 					}
 				}
