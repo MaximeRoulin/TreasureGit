@@ -80,6 +80,7 @@ public class TreasureGameSystemRuleSet01 implements GameSystem {
 	private boolean elevation;
 	private List<Cancelable> cancelable;
 	private int turn;
+	private CardAvailability turnState;
 	
 	//Constructor
 	public TreasureGameSystemRuleSet01(TreasureGamePanel gamePanel, ResourceBundle gamelogBundle, ResourceBundle messagesBundle, List<Player> players, boolean hideTurnPopUp, TreasureMainScreen caller, TreasureAudioSystem audioSystem) {
@@ -238,6 +239,16 @@ public class TreasureGameSystemRuleSet01 implements GameSystem {
 	public ResourceBundle getGamelogBundle() {
 		return gamelogBundle;
 	}
+
+	@Override
+	public CardAvailability getTurnState() {
+		return turnState;
+	}
+	
+	@Override
+	public void setTurnState(CardAvailability turnState) {
+		this.turnState = turnState;
+	}
 	
 	//Methods
 	public Player getCurrentPlayer() {
@@ -309,8 +320,9 @@ public class TreasureGameSystemRuleSet01 implements GameSystem {
 	
 	public boolean drawCard(Player playing) {
 		boolean cardEndsTurn = false;
-//		Card picked = forceCardPicked();
-		Card picked = pickExplorerCard();
+		Card picked = forceCardPicked();
+		//TODO: test Understanding and revert to pickedCard
+//		Card picked = pickExplorerCard();
 		//				System.out.println(picked.toString());
 		switch(picked.getType()) {
 		case INSTANT:
@@ -374,11 +386,12 @@ public class TreasureGameSystemRuleSet01 implements GameSystem {
 	
 	public Card forceCardPicked() {
 		Card returned;
-		if(testCounter != 3)
-			returned = new SpyCard(this);
-		else
-			returned = new VirusCard(this);
-		testCounter++;
+//		if(testCounter != 3)
+//			returned = new SpyCard(this);
+//		else
+//			returned = new VirusCard(this);
+//		testCounter++;
+		returned = new UnderstandingCard(this);
 		return returned;
 	}
 	
@@ -403,6 +416,7 @@ public class TreasureGameSystemRuleSet01 implements GameSystem {
 	}
 	
 	public void play(int playerIndex) throws Exception {
+		turnState = CardAvailability.BEFOREMOVE;
 		currentPlayerIndex = playerIndex;
 		if(currentPlayerIndex == 0) {
 			turn++;
@@ -440,13 +454,13 @@ public class TreasureGameSystemRuleSet01 implements GameSystem {
 						gamePanel.getHandPanel().disableNonInfoCards();
 						availableCardsFixed = true;
 					}
-					gamePanel.resetButtons(false);
+					gamePanel.disableButtons(false);
 				}
 			}
 			break;
 		default:
 			triggerPopUp(playing);
-			gamePanel.resetButtons(false);
+			gamePanel.disableButtons(false);
 			if(newInfo && tippedPlayerIndex == currentPlayerIndex) {
 				JOptionPane.showMessageDialog(null, messagesBundle.getString("new_info"));
 				newInfo = false;
@@ -628,8 +642,12 @@ public class TreasureGameSystemRuleSet01 implements GameSystem {
 		else {			
 			switch(move) {
 				case 0:
-					log.appendWithLineBreak(gamelogBundle.getString("critical_result"));
-					injurePlayer(currentPlayerIndex, pawn);
+					if(players.get(currentPlayerIndex).getRole().equals(PlayerRole.ENGINEER))
+						log.appendWithLineBreak(gamelogBundle.getString("trapped_engineer"));
+					else {						
+						log.appendWithLineBreak(gamelogBundle.getString("critical_result"));
+						injurePlayer(currentPlayerIndex, pawn);
+					}
 					gamePanel.getEndTurnButton().setEnabled(true);
 					break;
 				default:
@@ -676,12 +694,14 @@ public class TreasureGameSystemRuleSet01 implements GameSystem {
 					else {
 						injured.setHealth(injured.getHealth() - 1);
 						log.appendWithLineBreak(injured.getName() + " " + gamelogBundle.getString("solo_player_injured") + " " + injured.getHealth());
+						int cancelableTurn = turn;
 						cancelable.add(new Cancelable() {
 
 							@Override
 							public void undo() {
 								if((injured.getRole().equals(PlayerRole.DOCTOR) && injured.getHealth() != 6) || (!injured.getRole().equals(PlayerRole.PIRATE) && !injured.getRole().equals(PlayerRole.DOCTOR) && injured.getHealth() != 4))
 									injured.setHealth(injured.getHealth() + 1);
+								gamePanel.updateDisplayAfterInjury(findPlayerIndex(injured.getRole()), false);
 							}
 
 							@Override
@@ -691,7 +711,7 @@ public class TreasureGameSystemRuleSet01 implements GameSystem {
 
 							@Override
 							public int getTurn() {
-								return turn;
+								return cancelableTurn;
 							}
 							
 							@Override
@@ -828,7 +848,7 @@ public class TreasureGameSystemRuleSet01 implements GameSystem {
 
 	public void secondSetUpFight(Player hostile, int hostileScore, Player attacked, boolean initiated) {
 //		System.out.println("second set up");
-		gamePanel.resetButtons(true);
+		gamePanel.disableButtons(true);
 		int attackedScore = throwDice(1);
 		if(attacked.getRole().equals(PlayerRole.SOLDIER)) {
 			attackedScore++;
@@ -1147,22 +1167,22 @@ public class TreasureGameSystemRuleSet01 implements GameSystem {
 		String result = "";
 		switch(cancelable) {
 		case INJURY:
-			result = messagesBundle.getString("cancelable_injury") + player.getName() + " " + messagesBundle.getString("turn") + " " + turn + ")";
+			result = messagesBundle.getString("cancelable_injury") + player.getName() + " - " + messagesBundle.getString("turn") + " " + turn + ")";
 			break;
 		case CARDLOSS:
-			result = messagesBundle.getString("cancelable_card_loss") + player.getName() + " " + messagesBundle.getString("turn") + " " + turn + ")";
+			result = messagesBundle.getString("cancelable_card_loss") + player.getName() + " - " + messagesBundle.getString("turn") + " " + turn + ")";
 			break;
 		case DISPENSARY:	
-			result = messagesBundle.getString("cancelable_dispensary") + player.getName() + " " + messagesBundle.getString("turn") + " " + turn + ")";
+			result = messagesBundle.getString("cancelable_dispensary") + player.getName() + " - " + messagesBundle.getString("turn") + " " + turn + ")";
 			break;
 		case HAMMOCK:
-			result = messagesBundle.getString("cancelable_hammock") + player.getName() + " " + messagesBundle.getString("turn") + " " + turn + ")";
+			result = messagesBundle.getString("cancelable_hammock") + player.getName() + " - " + messagesBundle.getString("turn") + " " + turn + ")";
 			break;
 		case REINFORCEMENTS:
-			result = messagesBundle.getString("cancelable_reinforcements") + player.getName() + " " + messagesBundle.getString("turn") + " " + turn + ")";
+			result = messagesBundle.getString("cancelable_reinforcements") + player.getName() + " - " + messagesBundle.getString("turn") + " " + turn + ")";
 			break;
 		case RUM:
-			result = messagesBundle.getString("cancelable_rum") + player.getName() + " " + messagesBundle.getString("turn") + " " + turn + ")";
+			result = messagesBundle.getString("cancelable_rum") + player.getName() + " - " + messagesBundle.getString("turn") + " " + turn + ")";
 		}
 		return result;
 	}
@@ -1207,5 +1227,10 @@ public class TreasureGameSystemRuleSet01 implements GameSystem {
 			gamePanel.getLog().appendWithLineBreak(sick.getName() + " " + gamelogBundle.getString("infected"));
 			virused.add(sick);
 		}
+	}
+	
+	@Override
+	public void resumeTurn() {
+		gamePanel.resetButtonsAfterResume();
 	}
 }

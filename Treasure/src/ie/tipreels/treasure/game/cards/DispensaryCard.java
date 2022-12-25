@@ -69,10 +69,12 @@ public class DispensaryCard extends Card implements Cancelable {
 
 	@Override
 	public void undo() {
-		if(player.isAlone())
-			system.injurePlayer(player, 0, true);			
-		else
-			system.unReinforcePlayer(player);
+		if(player.isAlive()) {			
+			if(player.isAlone())
+				system.injurePlayer(player, 0, true);			
+			else
+				system.unReinforcePlayer(player);
+		}
 	}
 	
 	@Override

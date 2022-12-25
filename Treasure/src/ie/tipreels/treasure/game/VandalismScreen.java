@@ -13,6 +13,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import ie.tipreels.treasure.game.cards.Card;
+
 
 public class VandalismScreen extends JFrame implements HandPanelParent {
 
@@ -77,13 +79,48 @@ public class VandalismScreen extends JFrame implements HandPanelParent {
 	}
 
 	//Methods
-	@Override
 	public void selectCard(CardButton cardButton) {
+		for(ActionListener listener : discardCardButton.getActionListeners()) {
+			discardCardButton.removeActionListener(listener);
+		}
 		discardCardButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				system.discardCard(explorer, cardButton.getCard());
+				Card card = cardButton.getCard();
+				Player selectedPlayer = explorer;
+				system.discardCard(selectedPlayer, card);
+				system.getCancelable().add(new Cancelable () {
+
+					@Override
+					public void undo() {
+						if(selectedPlayer.isAlive()) {							
+							system.getPlayerHand(selectedPlayer).add(card);
+							if(system.getCurrentPlayer().equals(selectedPlayer))
+								system.getGamePanel().updateCards();
+						}
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public Player getPlayer() {
+						Player player = system.getCurrentPlayer();
+						return player;
+					}
+
+					@Override
+					public int getTurn() {
+						int turn = system.getTurn();
+						return turn;
+					}
+
+					@Override
+					public CancelableType getCancelableType() {
+						return CancelableType.CARDLOSS;
+					}
+					
+				});
 				system.allowMove(system.getCurrentPlayer(), true);
 				pointer.dispose();
 			}

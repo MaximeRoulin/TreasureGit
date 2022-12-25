@@ -5,6 +5,7 @@ import java.util.ResourceBundle;
 
 import ie.tipreels.treasure.TreasureGamePanel;
 import ie.tipreels.treasure.game.cards.Card;
+import ie.tipreels.treasure.game.cards.CardAvailability;
 import ie.tipreels.treasure.game.info.TreasureGameInfo;
 
 public interface GameSystem {
@@ -34,6 +35,8 @@ public interface GameSystem {
 	public List<Player> getRummed();
 	public ResourceBundle getMessagesBundle();
 	public ResourceBundle getGamelogBundle();
+	public CardAvailability getTurnState();
+	public void setTurnState(CardAvailability turnState);
 	
 	//Methods
 	public void setHideTurnPopUp(boolean hideTurnPopUp);
@@ -94,4 +97,5 @@ public interface GameSystem {
 	public Player getNextPlayer();
 	public void outbreak(Player contaminated);
 	public void contaminate(Player sick);
+	public void resumeTurn();
 }

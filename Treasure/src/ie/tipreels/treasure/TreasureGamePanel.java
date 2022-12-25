@@ -274,7 +274,10 @@ public class TreasureGamePanel extends JPanel implements HandPanelParent {
 //		System.out.println("Selected cards size before select: " + selectedCards.size());
 		if(selectedCard != null)
 			selectedCard.doClick();
-		selectedCard = cardButton;		
+		selectedCard = cardButton;	
+		for(ActionListener a : playCardButton.getActionListeners()) {
+			playCardButton.removeActionListener(a);
+		}
 		playCardButton.addActionListener(new PlayCardButtonActionListener(system, selectedCard, playCardButton, endTurnButton, handPanel));
 		playCardButton.setEnabled(true);
 	}
@@ -303,6 +306,7 @@ public class TreasureGamePanel extends JPanel implements HandPanelParent {
 							if(playing.getRole().equals(PlayerRole.PIRATE))
 								system.setPirateHasMoved(true);
 							movePlayerPawnToTile(playing, pawn, tile, button, y, x);
+							system.setTurnState(CardAvailability.AFTERMOVE);
 //							button.color(playing);
 //							tile.setTaken(true);
 //							tile.setOccupant(playing);
@@ -320,6 +324,7 @@ public class TreasureGamePanel extends JPanel implements HandPanelParent {
 								@Override
 								public void actionPerformed(ActionEvent e) {
 									lookForAFight(playing);	
+									system.setTurnState(CardAvailability.AFTERFIGHT);
 								}							
 								
 							});
@@ -640,9 +645,35 @@ public class TreasureGamePanel extends JPanel implements HandPanelParent {
 			endTurnButton.setEnabled(false);
 	}
 	
-	public void resetButtons(boolean endTurn) {
-//		System.out.println("reset buttons");
-		disableButtons(endTurn);
+	public void resetButtonsAfterResume() {
+		//TODO: reset buttons based on system.getTurnState
+		switch(system.getTurnState()) {
+		case BEFOREMOVE:
+			system.allowMove(system.getCurrentPlayer(), true);
+			break;
+		case AFTERMOVE:
+			for(ActionListener a : fightButton.getActionListeners()) {
+				fightButton.removeActionListener(a);
+			}
+			fightButton.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					lookForAFight(system.getCurrentPlayer());
+					
+				}
+			
+			});
+			fightButton.setEnabled(true);
+			endTurnButton.setEnabled(true);
+			changeAvailableCards(CardAvailability.AFTERMOVE);
+			break;
+		case AFTERFIGHT:
+			endTurnButton.setEnabled(true);
+			break;
+		default:
+			
+		}
 	}
 	
 	public void lookForAFight(Player hostile) {
@@ -851,6 +882,7 @@ public class TreasureGamePanel extends JPanel implements HandPanelParent {
 	}
 	
 	public void changeAvailableCards(CardAvailability availability) {
+//		System.out.println("Calling change available cards with availability: " + availability);
 		if(selectedCard != null) {
 			selectedCard.resetCardButtonBorder();
 			playCardButton.setEnabled(false);
@@ -862,7 +894,7 @@ public class TreasureGamePanel extends JPanel implements HandPanelParent {
 			button = (CardButton) comp;
 			switch(button.getCard().getAvailability()) {
 			case ALWAYS:
-				button.setEnabled(true);
+				available = true;
 				break;
 			case BEFOREMOVE:
 				if(availability.equals(CardAvailability.BEFOREMOVE))
@@ -1408,5 +1440,9 @@ public class TreasureGamePanel extends JPanel implements HandPanelParent {
 			}
 		}
 		endTurn();
+	}
+	
+	public void updateCards() {
+		handPanel.update(system.getPlayerHand(system.getCurrentPlayer()), false, system.getCurrentPlayer().getRole().equals(PlayerRole.PIRATE), myInfosShown);
 	}
 }

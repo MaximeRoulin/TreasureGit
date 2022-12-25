@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -51,8 +52,9 @@ public class UnderstandingScreen extends JFrame {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					cancelable.undo();
+					system.getCancelable().remove(cancelable);
 					system.getLog().appendWithLineBreak(system.getCancelableString(cancelable.getCancelableType(), cancelable.getPlayer(), cancelable.getTurn()) + " " + system.getGamelogBundle().getString("has_been_canceled"));
-					system.endTurn();
+					system.resumeTurn();
 					pointer.dispose();
 				}
 				
@@ -72,6 +74,21 @@ public class UnderstandingScreen extends JFrame {
 			buttonsPanel.add(button, gbc);
 			gbc.gridy++;
 		}
+		JButton backButton = new JButton(system.getMessagesBundle().getString("back"));
+		backButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				int selectedOption = JOptionPane.showConfirmDialog(null, system.getMessagesBundle().getString("are_you_sure"));
+				if(selectedOption == 0) {
+					system.resumeTurn();
+					pointer.dispose();
+				}
+			}
+			
+		});
+		buttonsPanel.add(backButton, gbc);
 		JScrollPane scroll = new JScrollPane(buttonsPanel);
 		gbc.gridy = 1;
 		mainPanel.add(scroll, gbc);
