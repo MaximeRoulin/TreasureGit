@@ -63,7 +63,7 @@ public class TreasureGameSystemRuleSet01 implements GameSystem {
 	private int tippedPlayerIndex;
 	private int tempIndex;
 	private boolean outOfTurnPirateControl;
-	private int testCounter;
+//	private int testCounter;
 	private List<Player> hammocked;
 	private List<Player> rummed;
 	private List<Player> virused;
@@ -102,7 +102,7 @@ public class TreasureGameSystemRuleSet01 implements GameSystem {
 		outOfTurnPirateControl = false;
 		givenInfoScreen = null;
 		tipScreen = null;
-		testCounter = 0;
+//		testCounter = 0;
 		pickedPawn = 0;
 		elevation = false;
 		turn = 0;
@@ -320,9 +320,9 @@ public class TreasureGameSystemRuleSet01 implements GameSystem {
 	
 	public boolean drawCard(Player playing) {
 		boolean cardEndsTurn = false;
-		Card picked = forceCardPicked();
-		//TODO: test Understanding and revert to pickedCard
-//		Card picked = pickExplorerCard();
+//		Card picked = forceCardPicked();
+		
+		Card picked = pickExplorerCard();
 		//				System.out.println(picked.toString());
 		switch(picked.getType()) {
 		case INSTANT:
@@ -354,8 +354,8 @@ public class TreasureGameSystemRuleSet01 implements GameSystem {
 	
 	public boolean drawCard(HammockScreen hammockScreen) {
 		boolean cardEndsTurn = false;
-		Card picked = forceCardPicked();
-		//				Card picked = pickExplorerCard();
+//		Card picked = forceCardPicked();
+		Card picked = pickExplorerCard();
 		//				System.out.println(picked.toString());
 		switch(picked.getType()) {
 		case INSTANT:
@@ -384,16 +384,16 @@ public class TreasureGameSystemRuleSet01 implements GameSystem {
 		return cardEndsTurn;
 	}
 	
-	public Card forceCardPicked() {
-		Card returned;
-//		if(testCounter != 3)
-//			returned = new SpyCard(this);
-//		else
-//			returned = new VirusCard(this);
-//		testCounter++;
-		returned = new UnderstandingCard(this);
-		return returned;
-	}
+//	public Card forceCardPicked() {
+//		Card returned;
+////		if(testCounter != 3)
+////			returned = new SpyCard(this);
+////		else
+////			returned = new VirusCard(this);
+////		testCounter++;
+//		returned = new UnderstandingCard(this);
+//		return returned;
+//	}
 	
 	public Card pickExplorerCard() {
 		if(playerCards.isEmpty()) {
